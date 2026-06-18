@@ -92,7 +92,7 @@ export default function AboutPage() {
 
         <div className="text-center">
           <Link
-            href="mailto:mindbridge@example.com"
+            href="mailto:jacqqq104@gmail.com?subject=MindBridge%20Global%20idea"
             className="inline-block px-7 py-3 rounded-full font-semibold text-white transition-opacity hover:opacity-90"
             style={{ backgroundColor: "var(--green)" }}
           >

@@ -29,7 +29,8 @@ export default function Footer() {
               ["/mind-body", "Mind & Body"],
               ["/take-action", "Take Action"],
               ["/resources", "Resources"],
-              ["/about", "About"],
+              ["/about-me", "About Me"],
+              ["/about", "About the Project"],
             ].map(([href, label]) => (
               <Link key={href} href={href} className="hover:text-white transition-colors">
                 {label}
@@ -42,17 +43,17 @@ export default function Footer() {
           <p className="text-white text-sm font-semibold mb-3">Contact</p>
           <p className="text-sm mb-4">Have a news idea or feedback? Reach out.</p>
           <Link
-            href="mailto:mindbridge@example.com"
+            href="mailto:jacqqq104@gmail.com"
             className="inline-block text-sm px-4 py-2 rounded-full border border-white/20 hover:border-white/50 transition-colors"
           >
-            Submit a news idea →
+            Email Jacqueline →
           </Link>
         </div>
       </div>
 
       <div className="border-t border-white/10 px-6 py-5 max-w-7xl mx-auto">
         <p className="text-xs text-gray-500">
-          © 2026 MindBridge Global · Independent student project · For education and awareness only · This is not medical advice, therapy, diagnosis, or crisis support.
+          © 2026 MindBridge Global · Independent student project · Photos from Unsplash · For education and awareness only · This is not medical advice, therapy, diagnosis, or crisis support.
         </p>
       </div>
     </footer>

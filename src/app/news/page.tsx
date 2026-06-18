@@ -1,11 +1,16 @@
 "use client"
 import { useState } from "react"
-import { articles, REGIONS, TOPICS } from "@/lib/data"
+import { publishedArticles as articles, REGIONS, TOPICS } from "@/lib/data"
 import ArticleCard from "@/components/ArticleCard"
 
+function getInitialFilter(key: "region" | "topic") {
+  if (typeof window === "undefined") return "All"
+  return new URLSearchParams(window.location.search).get(key) || "All"
+}
+
 export default function NewsPage() {
-  const [region, setRegion] = useState("All")
-  const [topic, setTopic] = useState("All")
+  const [region, setRegion] = useState(() => getInitialFilter("region"))
+  const [topic, setTopic] = useState(() => getInitialFilter("topic"))
 
   const filtered = articles.filter((a) => {
     const regionMatch = region === "All" || a.region === region

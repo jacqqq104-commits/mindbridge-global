@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { articles, briefs, REGIONS } from "@/lib/data"
+import { publishedArticles as articles, briefs, REGIONS } from "@/lib/data"
 import ArticleCard from "@/components/ArticleCard"
 
 const REGION_EMOJI: Record<string, string> = {
@@ -227,6 +227,17 @@ export default function Home() {
               See All Actions →
             </Link>
           </div>
+        </div>
+
+        <div className="mt-10 border-t border-gray-200 pt-10 flex flex-col md:flex-row md:items-center justify-between gap-5">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "var(--green)" }}>Get In Touch</p>
+            <h2 className="font-bold text-xl" style={{ color: "var(--navy)" }}>Have a story, idea, or question?</h2>
+            <p className="text-sm text-gray-500 mt-2">MindBridge Global is built by Jacqueline Wu, a student in Kaohsiung.</p>
+          </div>
+          <Link href="mailto:jacqqq104@gmail.com" className="shrink-0 px-6 py-3 rounded-full font-semibold text-white" style={{ backgroundColor: "var(--navy)" }}>
+            jacqqq104@gmail.com
+          </Link>
         </div>
       </div>
     </div>

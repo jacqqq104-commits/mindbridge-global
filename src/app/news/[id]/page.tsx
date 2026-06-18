@@ -1,4 +1,4 @@
-import { articles } from "@/lib/data"
+import { publishedArticles as articles } from "@/lib/data"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 

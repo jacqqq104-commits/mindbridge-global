@@ -9,7 +9,7 @@ const links = [
   { href: "/mind-body", label: "Mind & Body" },
   { href: "/take-action", label: "Take Action" },
   { href: "/resources", label: "Resources" },
-  { href: "/about", label: "About" },
+  { href: "/about-me", label: "About Me" },
 ]
 
 export default function Navbar() {

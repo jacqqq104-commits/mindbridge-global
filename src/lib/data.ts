@@ -362,6 +362,8 @@ export const articles: Article[] = [
   },
 ]
 
+export const publishedArticles = articles.filter((article) => article.approved && article.original_url !== "#")
+
 export const briefs: Brief[] = [
   {
     id: "brief-001",

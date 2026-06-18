@@ -3,6 +3,13 @@ const globalResources = [
   { name: "WHO Mental Health", desc: "World Health Organization mental health resources and global data", url: "https://www.who.int/health-topics/mental-health" },
   { name: "UNICEF – Mental Health", desc: "Resources for young people from UNICEF", url: "https://www.unicef.org/topics/mental-health" },
   { name: "International Association for Suicide Prevention", desc: "Global directory of crisis centers by country", url: "https://www.iasp.info/resources/Crisis_Centres/" },
+  { name: "Find a Helpline Taiwan", desc: "Directory of free mental health and crisis support options in Taiwan", url: "https://findahelpline.com/countries/tw" },
+]
+
+const taiwanResources = [
+  { name: "1925 Suicide Prevention Hotline", desc: "Taiwan 24-hour suicide prevention hotline. Dial 1925 if you need to talk.", url: "https://www.health.taichung.gov.tw/1065880/1065891/1065893/1504554" },
+  { name: "Taiwan emergency medical help", desc: "For immediate danger or urgent medical help in Taiwan, call 119.", url: "https://www.gov.uk/foreign-travel-advice/taiwan/getting-help" },
+  { name: "Taiwan police emergency", desc: "For police emergency assistance in Taiwan, call 110.", url: "https://www.npa.gov.tw/en/app/artwebsite/view?id=8033&module=artwebsite&serno=f74b8ff8-cfbd-4394-bc1c-82f95f8baca3" },
 ]
 
 export default function ResourcesPage() {
@@ -13,7 +20,7 @@ export default function ResourcesPage() {
           <p className="text-xs font-semibold uppercase tracking-widest mb-3" style={{ color: "var(--coral)" }}>Resources</p>
           <h1 className="text-white text-3xl md:text-5xl font-bold leading-tight">If You Need Support</h1>
           <p className="text-gray-400 mt-4 max-w-xl text-sm leading-relaxed">
-            This page is for education and awareness only. It is not medical advice, therapy, diagnosis, or crisis support.
+            Start local: talk to someone you trust at home or school, then use verified Taiwan support when you need more help.
           </p>
         </div>
       </section>
@@ -56,7 +63,7 @@ export default function ResourcesPage() {
             </p>
             <ul className="text-sm text-gray-700 list-disc list-inside space-y-2">
               <li>Talk to a trusted adult — a parent, teacher, or school counselor.</li>
-              <li>Contact a school counseling service. <span className="text-gray-400">(Add your school's contact here.)</span></li>
+              <li>At Kaohsiung American School, ask to speak with school counselor Ms. Susan Hernadaz through the usual school channels.</li>
               <li>Look up a verified crisis line for your country using the IASP directory below.</li>
             </ul>
           </div>
@@ -123,10 +130,25 @@ export default function ResourcesPage() {
         {/* Local */}
         <div>
           <h2 className="font-bold text-lg mb-4" style={{ color: "var(--navy)" }}>📍 Local & School Support</h2>
+          <div className="flex flex-col gap-4 mb-6">
+            {taiwanResources.map((r) => (
+              <a
+                key={r.name}
+                href={r.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block bg-white rounded-xl p-5 hover:shadow-md transition-shadow group"
+              >
+                <p className="font-semibold text-sm group-hover:underline underline-offset-2" style={{ color: "var(--navy)" }}>
+                  {r.name} →
+                </p>
+                <p className="text-xs text-gray-500 mt-1">{r.desc}</p>
+              </a>
+            ))}
+          </div>
           <div className="rounded-xl p-6 border border-dashed border-gray-300 text-sm text-gray-500 leading-relaxed">
-            <p className="mb-2">Local Taiwan support resources: <span className="italic">Add verified resources here.</span></p>
-            <p className="mb-2">School counselor or trusted adult: <span className="italic">Add appropriate contact information only if allowed.</span></p>
-            <p>Emergency support: <span className="italic">Add verified emergency instructions for your location.</span></p>
+            <p className="font-semibold mb-2" style={{ color: "var(--navy)" }}>KAS school support</p>
+            <p>Students can ask to speak with school counselor Ms. Susan Hernadaz through the school office or regular KAS communication channels. This independent website does not publish private staff contact details.</p>
           </div>
         </div>
       </div>
