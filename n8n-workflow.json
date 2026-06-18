@@ -1,0 +1,166 @@
+{
+  "name": "MindBridge Global — News Pipeline",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [{ "field": "hours", "hoursInterval": 6 }]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Every 6 Hours",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "url": "https://www.who.int/rss-feeds/news-english.xml",
+        "options": {}
+      },
+      "id": "rss-who",
+      "name": "WHO RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [460, 200]
+    },
+    {
+      "parameters": {
+        "url": "https://feeds.bbci.co.uk/news/health/rss.xml",
+        "options": {}
+      },
+      "id": "rss-bbc",
+      "name": "BBC Health RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [460, 340]
+    },
+    {
+      "parameters": {
+        "url": "https://focustaiwan.tw/rss/health.xml",
+        "options": {}
+      },
+      "id": "rss-taiwan",
+      "name": "Focus Taiwan RSS",
+      "type": "n8n-nodes-base.rssFeedRead",
+      "position": [460, 480]
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combinationMode": "mergeByPosition",
+        "options": {}
+      },
+      "id": "merge-feeds",
+      "name": "Merge All Feeds",
+      "type": "n8n-nodes-base.merge",
+      "position": [680, 340]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": false },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.title + ' ' + ($json.contentSnippet ?? '') }}",
+              "rightValue": "mental health|youth mental|student stress|anxiety|depression|burnout|suicide|wellbeing|counseling|social media|sleep|trauma|school pressure|loneliness",
+              "operator": { "type": "string", "operation": "regex" }
+            }
+          ]
+        }
+      },
+      "id": "keyword-filter",
+      "name": "Keyword Filter",
+      "type": "n8n-nodes-base.filter",
+      "position": [900, 340]
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "tableId": "articles",
+        "filterByFormula": "={id}",
+        "options": {}
+      },
+      "id": "check-duplicate",
+      "name": "Check Duplicate",
+      "type": "n8n-nodes-base.supabase",
+      "position": [1120, 340],
+      "credentials": { "supabaseApi": { "id": "supabase-cred", "name": "Supabase MindBridge" } }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "conditions": [
+            {
+              "leftValue": "={{ $json.length }}",
+              "rightValue": 0,
+              "operator": { "type": "number", "operation": "equals" }
+            }
+          ]
+        }
+      },
+      "id": "is-new",
+      "name": "Is New Article?",
+      "type": "n8n-nodes-base.filter",
+      "position": [1340, 340]
+    },
+    {
+      "parameters": {
+        "resource": "message",
+        "model": "claude-opus-4-8",
+        "messages": {
+          "values": [
+            {
+              "role": "user",
+              "content": "You are writing for MindBridge Global, a student-led mental health news website for high school students.\n\nArticle title: {{ $('keyword-filter').item.json.title }}\nSource: {{ $('keyword-filter').item.json.link }}\nSnippet: {{ $('keyword-filter').item.json.contentSnippet }}\n\nWrite a JSON object with these fields:\n- summary: 2-sentence plain-English summary (student-friendly, no jargon)\n- why_it_matters: 1-2 sentences on why this matters to students globally\n- student_takeaway: 1-2 sentences — a practical or reflective insight for a student reader\n- country: best guess at which country this is about (or 'Global')\n- region: one of [Asia, Europe, Africa, Americas, Middle East, Oceania, Global / WHO]\n- topic: one of [Youth, School, Social Media, Policy, Research, Crisis & Trauma, Good News, Mind & Body]\n- image_color: one of [from-blue-900 to-blue-700, from-teal-900 to-teal-700, from-purple-900 to-purple-700, from-emerald-900 to-emerald-700, from-indigo-900 to-indigo-700, from-green-900 to-green-700, from-rose-900 to-rose-700, from-violet-900 to-violet-700]\n\nReturn ONLY valid JSON, no markdown, no explanation."
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "claude-summarize",
+      "name": "Claude: Summarize",
+      "type": "@n8n/n8n-nodes-langchain.lmChatAnthropic",
+      "position": [1560, 340],
+      "credentials": { "anthropicApi": { "id": "anthropic-cred", "name": "Anthropic API" } }
+    },
+    {
+      "parameters": {
+        "jsCode": "const raw = $input.first().json.text || $input.first().json.content || '{}'\nlet parsed = {}\ntry { parsed = JSON.parse(raw) } catch(e) { parsed = {} }\n\nconst source = $('keyword-filter').first().json\nconst date = new Date(source.pubDate || Date.now()).toISOString().split('T')[0]\nconst id = 'n8n-' + Date.now()\n\nreturn [{\n  json: {\n    id,\n    title: source.title,\n    country: parsed.country || 'Global',\n    region: parsed.region || 'Global / WHO',\n    topic: parsed.topic || 'Youth',\n    source: source.link ? new URL(source.link).hostname.replace('www.','') : 'Unknown',\n    date,\n    summary: parsed.summary || source.contentSnippet || '',\n    why_it_matters: parsed.why_it_matters || '',\n    student_takeaway: parsed.student_takeaway || '',\n    original_url: source.link || '#',\n    image_color: parsed.image_color || 'from-blue-900 to-blue-700',\n    approved: false\n  }\n}]"
+      },
+      "id": "format-article",
+      "name": "Format Article",
+      "type": "n8n-nodes-base.code",
+      "position": [1780, 340]
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "tableId": "articles",
+        "dataToSend": "autoMapInputData",
+        "options": {}
+      },
+      "id": "save-to-supabase",
+      "name": "Save Draft to Supabase",
+      "type": "n8n-nodes-base.supabase",
+      "position": [2000, 340],
+      "credentials": { "supabaseApi": { "id": "supabase-cred", "name": "Supabase MindBridge" } }
+    }
+  ],
+  "connections": {
+    "Every 6 Hours": {
+      "main": [[
+        { "node": "WHO RSS", "type": "main", "index": 0 },
+        { "node": "BBC Health RSS", "type": "main", "index": 0 },
+        { "node": "Focus Taiwan RSS", "type": "main", "index": 0 }
+      ]]
+    },
+    "WHO RSS": { "main": [[{ "node": "Merge All Feeds", "type": "main", "index": 0 }]] },
+    "BBC Health RSS": { "main": [[{ "node": "Merge All Feeds", "type": "main", "index": 1 }]] },
+    "Focus Taiwan RSS": { "main": [[{ "node": "Merge All Feeds", "type": "main", "index": 2 }]] },
+    "Merge All Feeds": { "main": [[{ "node": "Keyword Filter", "type": "main", "index": 0 }]] },
+    "Keyword Filter": { "main": [[{ "node": "Check Duplicate", "type": "main", "index": 0 }]] },
+    "Check Duplicate": { "main": [[{ "node": "Is New Article?", "type": "main", "index": 0 }]] },
+    "Is New Article?": { "main": [[{ "node": "Claude: Summarize", "type": "main", "index": 0 }]] },
+    "Claude: Summarize": { "main": [[{ "node": "Format Article", "type": "main", "index": 0 }]] },
+    "Format Article": { "main": [[{ "node": "Save Draft to Supabase", "type": "main", "index": 0 }]] }
+  },
+  "settings": { "executionOrder": "v1" }
+}

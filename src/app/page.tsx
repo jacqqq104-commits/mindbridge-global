@@ -1,5 +1,6 @@
 import Link from "next/link"
-import { publishedArticles as articles, briefs, REGIONS } from "@/lib/data"
+import { briefs, REGIONS } from "@/lib/data"
+import { fetchArticles } from "@/lib/fetchArticles"
 import ArticleCard from "@/components/ArticleCard"
 
 const REGION_EMOJI: Record<string, string> = {
@@ -12,10 +13,11 @@ const REGION_EMOJI: Record<string, string> = {
   "Global / WHO": "🌐",
 }
 
-export default function Home() {
+export default async function Home() {
+  const articles = await fetchArticles()
   const featured = articles[0]
   const latest = articles.slice(1, 9)
-  const weeklyFocus = articles.find((a) => a.topic === "Social Media")!
+  const weeklyFocus = articles.find((a) => a.topic === "Social Media") ?? articles[1]
   const latestBriefs = briefs.slice(0, 3)
 
   return (

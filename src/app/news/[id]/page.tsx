@@ -1,17 +1,21 @@
-import { publishedArticles as articles } from "@/lib/data"
+import { articles as localArticles } from "@/lib/data"
+import { fetchArticles, fetchArticleById } from "@/lib/fetchArticles"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 
-export function generateStaticParams() {
-  return articles.map((a) => ({ id: a.id }))
+export async function generateStaticParams() {
+  return localArticles.map((a) => ({ id: a.id }))
 }
+
+export const dynamicParams = true
 
 export default async function ArticlePage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = await params
-  const article = articles.find((a) => a.id === id)
+  const article = await fetchArticleById(id)
   if (!article) notFound()
 
-  const related = articles.filter((a) => a.id !== article.id && (a.region === article.region || a.topic === article.topic)).slice(0, 3)
+  const allArticles = await fetchArticles()
+  const related = allArticles.filter((a) => a.id !== article.id && (a.region === article.region || a.topic === article.topic)).slice(0, 3)
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-14">
